@@ -1,0 +1,13 @@
+{
+  "name": "orderbook-depth-visualizer",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Live orderbook depth visualizer for the ParlayX stream service",
+  "scripts": {
+    "start": "node server.mjs"
+  },
+  "dependencies": {
+    "ws": "^8.18.0"
+  }
+}
