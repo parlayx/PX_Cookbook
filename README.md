@@ -1,4 +1,4 @@
-# PX Cookbook
+# ParlayX Aggregator Cookbook
 
 Small, self contained sample projects that show practical use cases for the
 ParlayX platform. Each subdirectory is one demo you can clone, run, and read
