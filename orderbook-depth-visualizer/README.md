@@ -89,6 +89,10 @@ specific ahead of time. Both calls authenticate with your API key in the
      -H "x-api-key: $PARX_API_KEY"
    ```
 
+   The outcome's `outcomeId` is what you subscribe with, on both venues. For
+   Limitless pair it with the market's slug as `marketKey`; both values come
+   from the same response.
+
 ### Option B: the venue APIs directly
 
 If you already work with a venue, you can pass its native ids and slugs straight
@@ -103,12 +107,14 @@ curl -s "https://gamma-api.polymarket.com/markets?closed=false&active=true&order
   | python3 -c 'import sys,json; [print(m["question"], json.loads(m["outcomes"]), json.loads(m["clobTokenIds"])) for m in json.load(sys.stdin)]'
 ```
 
-Limitless CLOB markets are identified by their slug. List active markets and
-keep the ones with `tradeType` of `clob` that are not expired:
+Limitless CLOB markets are identified by their slug plus an outcome token id
+(the listing's `tokens.yes` / `tokens.no`). List active markets, keep the ones
+with `tradeType` of `clob` that are not expired, and note the slug together
+with the token of the side you want:
 
 ```sh
 curl -s "https://api.limitless.exchange/markets/active?limit=30" \
-  | python3 -c 'import sys,json; [print(m["slug"], "|", m["title"]) for m in json.load(sys.stdin)["data"] if m.get("tradeType")=="clob" and not m.get("expired")]'
+  | python3 -c 'import sys,json; [print(m["slug"], "|", m["title"], "| yes:", m["tokens"]["yes"], "| no:", m["tokens"]["no"]) for m in json.load(sys.stdin)["data"] if m.get("tradeType")=="clob" and not m.get("expired")]'
 ```
 
 ### Build the stream object
@@ -119,9 +125,15 @@ Either way, drop the ids into the `stream` field of a `config.mjs` entry:
 /* Polymarket: outcomeId is the ERC1155 token id of the outcome */
 { venue: "polymarket", outcomeId: "<outcomeId>" }
 
-/* Limitless CLOB: marketKey is the slug, outcomeId is the outcome name */
-{ venue: "limitless", kind: "clob", marketKey: "<slug>", outcomeId: "YES" }
+/* Limitless CLOB: marketKey is the slug, outcomeId is the outcome token id
+   (the slug's yes or no token — not the literal "YES"/"NO") */
+{ venue: "limitless", kind: "clob", marketKey: "<slug>", outcomeId: "<outcomeId>" }
 ```
+
+On both venues `outcomeId` carries the same value the Markets API returns for
+the outcome. A Limitless `outcomeId` that matches neither of the slug's two
+tokens is rejected with an `unknownMarket` error, so keep the slug and token
+from the same market.
 
 Markets resolve and Limitless crypto markets (the "Up or Down" series) roll over
 on a fixed cadence, so subscribe to markets that are currently open and refresh

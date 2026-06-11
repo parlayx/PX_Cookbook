@@ -6,7 +6,11 @@
 
    MarketStream shapes:
      Polymarket : { venue: "polymarket", outcomeId: "<ERC1155 token id>" }
-     Limitless  : { venue: "limitless", kind: "clob", marketKey: "<slug>", outcomeId: "YES" }
+     Limitless  : { venue: "limitless", kind: "clob", marketKey: "<slug>", outcomeId: "<outcome token id>" }
+
+   On both venues `outcomeId` is the outcome token id the Markets API returns
+   for the side you want (for Limitless that is the slug's yes or no token, not
+   the literal "YES"/"NO" — a value matching neither token is rejected).
 
    The entries below are examples and will go stale as markets resolve (the
    Limitless hourly slug rolls over every hour). See the README section
@@ -35,14 +39,15 @@ export const MARKETS = [
     },
   },
   {
-    /* Limitless hourly markets roll over every hour, so this slug goes stale.
-       Look up a current one as described in the README. */
-    label: "BTC up or down, hourly (Limitless)",
+    /* Limitless hourly markets roll over every hour, so this slug and its
+       tokens go stale together. Look up a current pair as described in the
+       README — the slug and the outcome token must come from the same market. */
+    label: "HYPE up or down, hourly (Limitless, Yes)",
     stream: {
       venue: "limitless",
       kind: "clob",
-      marketKey: "btc-up-or-down-hourly-1780988439523",
-      outcomeId: "YES",
+      marketKey: "hype-up-or-down-hourly-1781150442538",
+      outcomeId: "92842615040448225144367132657419497752659438828077165280538386234205033582086",
     },
   },
 ];
